@@ -71,19 +71,3 @@ The convergence interval after quadrant reduction is `[-pi/2, +pi/2]`. Twenty-ei
 
 These values are from `tb/math_accelerator_tb.v` using a 10 ns clock and 100 samples per opcode. The one-cycle difference between latency and command-port interval is the required post-completion handshake edge. No FPGA/ASIC synthesis tool is assumed in this repository, so LUT, flip-flop, DSP, RAM, critical-path, and Fmax numbers are intentionally not fabricated.
 
-## Verification
-
-The Python reference uses Python only outside RTL to pack/unpack FP32 values and generate hexadecimal vectors. It includes edge values, special values, subnormals, boundary values, and 512 deterministic random pairs for scalar arithmetic. The Verilog testbenches cover scalar add, multiply, MAC, complex arithmetic, CORDIC control, and every top-level arithmetic dispatch path.
-
-Run:
-
-```sh
-./scripts/run_tests.sh
-./scripts/benchmark.sh
-```
-
-`run_tests.sh` uses Icarus Verilog when installed and always regenerates the vector files. The expected numerical report format is `tests`, `passed`, `failed`, `max_error`, and `average_error`; CORDIC comparisons use absolute/relative tolerances because it is an iterative fixed-point approximation.
-
-## Demonstration workload
-
-The FP_MAC opcode directly implements the vector kernel `Y[i] = A[i] * B[i] + C[i]` by repeatedly issuing requests while observing `busy/done`. C_MUL repeatedly implements complex vector multiplication, and SIN/COS requests evaluate a stream of angles. The input mapping and fixed operation latency make all three workloads straightforward to drive from a DMA or software command queue.
